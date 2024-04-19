@@ -1,27 +1,37 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
+
 #define TAM 5
 
 int digitaInteiro();
+bool testaInteiro(const char *str);
+void pausa();
 void consultaVetor(int vetor[TAM]);
 void mostraVetor(int vetor[TAM]);
-void removeNumero(int vetor[TAM], int contaVetor);
-void insereNumero(int vetor[TAM], int contaVetor);
+void removeNumero(int vetor[TAM], int *contaVetor);
+void insereNumero(int vetor[TAM], int *contaVetor);
 
 int main()
 {
-    int i, menu, vetor[TAM], contaVetor=0;
+    int i, menu, vetor[TAM], contaVetor=0; 
+ 
     
     //inserindo valores para teste
     for (i=0; i<TAM; i++) {
-        vetor[i] = 100+i;
+        vetor[i] = 0;
     }
-    
-    while(menu!=4) {
+    //informar os erros (os ifs estão sem else)
+    //ver como verificar numero inteiro
+    while(menu!=5) {
         printf("\n\nConsulte, remova ou insira valores num vetor.\n");
-        printf("\n\t1 - Consulta");
-        printf("\n\t2 - Inserir");
-        printf("\n\t3 - Remover");
-        printf("\n\t4 - Sair\n");
+        printf("\n\t1 - Consulta posição");
+        printf("\n\t2 - Mostrar Vetor");
+        printf("\n\t3 - Inserir");
+        printf("\n\t4 - Remover");
+        printf("\n\t5 - Sair\n");
         
         printf("\nInforme o número da opção desejada: ");    
             menu = digitaInteiro();
@@ -29,24 +39,26 @@ int main()
         switch(menu) {
             case 1: consultaVetor(vetor);
             break;
-            case 2: 
+            case 2: mostraVetor(vetor);
+            break;
+            case 3: 
                 if(contaVetor>=TAM) {
                     printf("\nO vetor está cheio. Não é possível inserir mais valores.\n");
                     mostraVetor(vetor);
                 } else {
                     printf("\ncontaVetor: %i\n", contaVetor);
-                    insereNumero(vetor, contaVetor);
+                    insereNumero(vetor, &contaVetor);
                 }
                 break;
-            case 3: 
+            case 4: 
                 if(contaVetor==0) {
                     printf("Vetor já está vazio.");
                     mostraVetor(vetor);
                 } else {
-                    removeNumero(vetor, contaVetor); //está com loop interno resolvido
+                    removeNumero(vetor, &contaVetor); //está com loop interno resolvido
                 }
                 break;
-            case 4: //sair?
+            case 5: printf("\nSAIR...");
             break;
         } 
     }
@@ -54,26 +66,64 @@ int main()
     return 0;
 }
 
-int digitaInteiro() {
-    int num;
+void pausa(){
+    printf("\n*\nPressione qualquer tecla para continuar...\n");
+    getchar();
+    system("clear");
+    printf("\n*\n*\n\n");
+}
+
+
+bool testaInteiro(const char *str) {
+    // Verifica se a string está vazia
+    if (str[0] == '\0') {
+        return false;
+    }
     
-    do {
-        printf("\n\nDigite um número inteiro: ");
-        scanf("%i", &num); getchar();
-        if(num>0) {
-            break;
+    // Verifica cada caractere da string
+    for (int i = 0; str[i] != '\0'; i++) {
+        // Se o caractere não é um dígito, retorna falso
+        if (!isdigit(str[i])) {
+            return false;
         }
-    } while (1);
+    }
     
-    return num;
+    // Se todos os caracteres forem dígitos, retorna verdadeiro
+    return true;
+}
+
+int digitaInteiro() {
+    
+    char numPalavra[100];
+    while(1) {
+        printf("\nDigite um número: ");
+        
+        // Lê a entrada do usuário como uma string
+        fgets(numPalavra, sizeof(numPalavra), stdin);
+        
+        // Remove o caractere de nova linha, se tiver
+        numPalavra[strcspn(numPalavra, "\n")] = '\0';
+        
+        // Verifica se a entrada é um número inteiro
+        if (testaInteiro(numPalavra)) {
+            int num = atoi(numPalavra); // Converte a string para um número inteiro
+            printf("Você digitou o número: %d\n", num);
+            return num;
+        } else {
+            printf("\n*\nEntrada inválida. Por favor, digite um número inteiro.\n*\n*\n\n");
+            continue;
+        }
+    }
 }
 
 void consultaVetor(int vetor[TAM]) {
+    system("clear");
     do {
         printf("\n\nEscolha a posição no vetor entre 1 e %d", TAM);
         int num = digitaInteiro();
         if(num<TAM-1 && num>=0) {
             printf("\n*\nPosição %i \tValor: %d\n*\n", num, vetor[num]);
+            pausa();
             break;
         } else {
             printf("\n*\nPosição inválida!\n*\n");
@@ -82,87 +132,105 @@ void consultaVetor(int vetor[TAM]) {
 }
 
 void mostraVetor(int vetor[TAM]) {
-    //mostrando vetor completo
     int i;
+    
+    system("clear");
+    
+    //mostrando vetor completo
+    printf("\n*\n*\n");
     for (i=0; i<TAM; i++) {
         printf("\nPosição: %i \tValor: %i", i, vetor[i]);
     }
+    pausa();
 }
 
-void removeNumero(int vetor[TAM], int contaVetor) {
-        int i, num = 0;
+void removeNumero(int vetor[TAM], int *contaVetor) {
+    int i, num = 0;
+    
+    system("clear");
     
     while (1) {
         
-        if(contaVetor==0) {
+        if(*contaVetor==0) {
             return;
         }
         printf("\nInforme a posição a ser removida (de 1 a %i): ", TAM);    
         printf("\nDigite -1 para voltar ao menu principal\n");
-        scanf("%d", &num);
+        scanf("%d", &num); getchar();
         
         if(num == -1) {
-            printf("\nPrograma encerrado...\n");
+            printf("\n*\n*\nVoltando para o menu principal...\n");
             return;
         }
+      
+        if (num < 1 || num >= TAM) {
+            printf("***Posição inválida.\n");
+            continue; //volta para o início do loop
+        }
         
-        num--; // Ajusta o índice para a faixa de 0 a TAM-1
+        num--; // Ajusta o índice para a faixa de 1 a TAM-1
         
-        if (num < 0 || num >= TAM) {
-                printf("***Posição inválida.\n");
-                continue; //volta para o início do loop
+        if(vetor[num] == 0) {
+            printf("*\n*\nPosição já está vazia.");
+            continue;
+        } else {
+            // Reordena o vetor
+            for (i = num; i < TAM - 1; i++) {
+                vetor[i] = vetor[i + 1];
             }
-    
-        // Reordena o vetor após a remoção
-        for (i = num; i < TAM - 1; i++) {
-            vetor[i] = vetor[i + 1];
+            
+            // Ajusta o último elemento para manter o vetor com o mesmo número de posições
+            vetor[TAM - 1] = 0;
+            (*contaVetor)--;
+            
         }
-        
-        // Ajusta o último elemento para manter o vetor com o mesmo número de posições
-        vetor[TAM - 1] = 0;
-        contaVetor--;
-        
         printf("\nVetor após remoção e reordenação:\n");
-        for (i = 0; i < TAM; i++) {
-            printf("Vetor[%i] %i\n", i, vetor[i]);
-        }
-        
+            mostraVetor(vetor);
     }    
 }
 
-void insereNumero(int vetor[TAM], int contaVetor) {
+void insereNumero(int vetor[TAM], int *contaVetor) {
     int i, numeroPosicao=0, numeroDigitado;
     
+    system("clear");
+    
     do {
-        printf("\ncontaVetor: %i\n", contaVetor);
-        if (contaVetor==TAM) {
+        printf("\ncontaVetor: %i\n", *contaVetor);
+        if (*contaVetor==TAM) {
         	return;
         }	
         
-        printf("\nInforme a posição no vetor (de 1 a %i): ", TAM);    
-        scanf("%i", &numeroPosicao);
+        printf("\nInforme a posição no vetor (de 1 a %i): ", TAM);   
+        printf("\nDigite -1 para voltar ao menu principal\n");
+        scanf("%i", &numeroPosicao); getchar();
+        
+        if(numeroPosicao == -1) {
+            printf("\n*\n*\nVoltando para o menu principal...\n");
+            return;
+        }
+        
         numeroPosicao--;
         
         if(numeroPosicao<0 || numeroPosicao>TAM-1) {
         	//valida posição no vetor
-        	printf("Posição inválida. Insira um número entre 0 e 4: \n");
+        	printf("Posição inválida. Insira um número entre 1 e %i: \n", TAM);
         	
-        } else if (vetor[numeroPosicao] == 0 && contaVetor == numeroPosicao) {
+        } else if (vetor[numeroPosicao] == 0 && *contaVetor == numeroPosicao) {
         	//insere o número no vetor
         	numeroDigitado = digitaInteiro();
         	vetor[numeroPosicao] = numeroDigitado;
-            contaVetor++;
+            (*contaVetor)++;
             printf("Número inserido na posição indicada %d.\n", numeroPosicao);
             mostraVetor(vetor);
         	
-        } else if (contaVetor<numeroPosicao) {
+        } else if (*contaVetor<numeroPosicao) {
         	//verifica qual a primeira posição vazia até posição => insere o número no vetor
         	numeroDigitado = digitaInteiro();
         	for(i=0;i<numeroPosicao;i++) {
                 if(vetor[i] == 0) {
                 //verifica qual a primeira posição vazia até posição => insere o número
                     vetor[i] = numeroDigitado;
-                    contaVetor++;
+                    (*contaVetor)++;
                         
                     printf("\n-------------------\n");
                     printf("Inserido %d na primeira posição disponivel: %d", numeroDigitado, i);
@@ -183,10 +251,13 @@ void insereNumero(int vetor[TAM], int contaVetor) {
                 
                 //adiciona número na posição escolhida (já copiada para a posição seguinte)
                 vetor[numeroPosicao] = numeroDigitado;
-                contaVetor++;
+                (*contaVetor)++;
         	printf("Número inserido na posição %d. Reordenado\n", numeroPosicao);
         	mostraVetor(vetor);
         }
-    } while(numeroPosicao!=100);
+    } while(1);
 }
+
+
+
 

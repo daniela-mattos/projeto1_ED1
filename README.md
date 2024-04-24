@@ -15,7 +15,7 @@ Projeto para a disciplina Estrutura de Dados I, do curso Tecnologias em Sistemas
   3.1.  Remover da posição informada pelo usuário;<br>
   3.2. Informar se já estiver vazia;<br>
   3.3. Reordenar posições posteriores para não deixar o espaço vazio;<br>
-<h3>>4- Mostrar a lista de códigos;</h3>
+<h3>4- Mostrar a lista de códigos;</h3>
 <h3>5- Mostrar a quantidade de elementos no vetor;</h3>
 <h3>6- Menu interativo.</h3>
 
